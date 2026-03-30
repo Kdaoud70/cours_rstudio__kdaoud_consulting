@@ -1,0 +1,1197 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cours RStudio — Les Bases</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700&family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f5f7fa;
+    --surface: #ffffff;
+    --surface2: #eef1f6;
+    --border: #d0d7e3;
+    --r-blue: #1a6bb5;
+    --r-teal: #0077a8;
+    --r-green: #1a7f45;
+    --r-orange: #c0392b;
+    --r-purple: #6b3fa0;
+    --r-yellow: #b07d00;
+    --text: #1a202c;
+    --text-muted: #4a5568;
+    --code-bg: #f0f4f8;
+    --code-border: #c8d3e0;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+    font-size: 17px;
+    line-height: 1.7;
+  }
+
+  /* HEADER */
+  .hero {
+    background: linear-gradient(135deg, #1a4a8a 0%, #1a6bb5 50%, #0077a8 100%);
+    padding: 60px 40px 50px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    border-bottom: 3px solid #1a4a8a;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 30% 50%, rgba(255,255,255,0.08) 0%, transparent 60%),
+                radial-gradient(ellipse at 70% 30%, rgba(255,255,255,0.05) 0%, transparent 60%);
+  }
+  .hero-badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.18);
+    border: 1px solid rgba(255,255,255,0.4);
+    color: #ffffff;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    padding: 6px 16px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+    letter-spacing: 0.06em;
+  }
+  .hero h1 {
+    font-size: clamp(2.2rem, 5vw, 3.8rem);
+    font-weight: 800;
+    line-height: 1.1;
+    position: relative;
+    margin-bottom: 16px;
+    color: #ffffff;
+  }
+  .hero h1 span { color: #7dd3fc; }
+  .hero p {
+    color: rgba(255,255,255,0.88);
+    font-size: 1.1rem;
+    max-width: 600px;
+    margin: 0 auto 30px;
+    line-height: 1.7;
+  }
+  .hero-stats {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    flex-wrap: wrap;
+    position: relative;
+  }
+  .stat { text-align: center; }
+  .stat-num {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #7dd3fc;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .stat-label {
+    font-size: 0.82rem;
+    color: rgba(255,255,255,0.75);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  /* AUTHOR CARD */
+  .author-card {
+    display: inline-flex;
+    align-items: center;
+    gap: 16px;
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 14px;
+    padding: 14px 28px;
+    margin: 24px auto 28px;
+    position: relative;
+  }
+  .author-avatar {
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #7dd3fc, #ffffff);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.3rem; font-weight: 800;
+    color: #1a4a8a;
+    flex-shrink: 0;
+  }
+  .author-info { text-align: left; }
+  .author-name { font-weight: 800; font-size: 1.05rem; color: #ffffff; }
+  .author-title { font-size: 0.88rem; color: #7dd3fc; font-weight: 600; }
+  .author-sub { font-size: 0.82rem; color: rgba(255,255,255,0.75); margin-top: 2px; }
+
+  /* NAV */
+  .nav-container {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: #ffffff;
+    backdrop-filter: blur(12px);
+    border-bottom: 2px solid var(--border);
+    padding: 0 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+  .nav {
+    display: flex;
+    gap: 4px;
+    overflow-x: auto;
+    padding: 10px 0;
+    scrollbar-width: none;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .nav::-webkit-scrollbar { display: none; }
+  .nav-btn {
+    flex-shrink: 0;
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--text-muted);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .nav-btn:hover { color: var(--r-blue); border-color: var(--border); background: var(--surface2); }
+  .nav-btn.active {
+    background: #e8f0fd;
+    border-color: #1a6bb5;
+    color: #1a4a8a;
+    font-weight: 700;
+  }
+
+  /* MAIN */
+  .main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 44px 24px 80px;
+  }
+
+  /* SECTIONS */
+  .section { display: none; animation: fadeIn 0.35s ease; }
+  .section.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  .section-title {
+    font-size: 1.9rem;
+    font-weight: 800;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    color: var(--text);
+  }
+  .section-title .icon {
+    width: 46px; height: 46px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.3rem;
+    flex-shrink: 0;
+  }
+  .section-sub {
+    color: var(--text-muted);
+    margin-bottom: 32px;
+    font-size: 1.05rem;
+    line-height: 1.7;
+    padding-left: 60px;
+  }
+
+  /* CARDS */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 26px;
+    margin-bottom: 22px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    transition: box-shadow 0.2s, border-color 0.2s;
+  }
+  .card:hover { box-shadow: 0 4px 16px rgba(26,107,181,0.1); border-color: #1a6bb5; }
+  .card-title {
+    font-size: 1.08rem;
+    font-weight: 700;
+    margin-bottom: 14px;
+    color: var(--r-teal);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card p, .card li {
+    color: var(--text-muted);
+    font-size: 1rem;
+    line-height: 1.75;
+  }
+  .card ul { padding-left: 20px; }
+  .card li { margin-bottom: 6px; }
+
+  /* CODE BLOCKS */
+  .code-block {
+    background: var(--code-bg);
+    border: 1px solid var(--code-border);
+    border-radius: 12px;
+    margin: 18px 0;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  .code-header {
+    background: #dce5f0;
+    border-bottom: 1px solid var(--code-border);
+    padding: 9px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .code-lang {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--r-purple);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 700;
+  }
+  .code-desc { font-size: 0.82rem; color: var(--text-muted); }
+  pre {
+    padding: 22px;
+    overflow-x: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.95rem;
+    line-height: 1.75;
+    color: #1a202c;
+  }
+
+  /* Syntax highlighting — couleurs adaptées fond clair */
+  .r-comment { color: #6a7f9e; font-style: italic; }
+  .r-string  { color: #1a7f45; }
+  .r-number  { color: #b84c00; }
+  .r-func    { color: #6b3fa0; font-weight: 600; }
+  .r-keyword { color: #c0392b; font-weight: 600; }
+  .r-var     { color: #0077a8; }
+  .r-output  { color: #718096; font-style: italic; }
+
+  /* GRID */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+  @media(max-width:700px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+
+  /* TABLE */
+  .table-wrap { overflow-x: auto; margin: 18px 0; border-radius: 10px; border: 1px solid var(--border); }
+  table { width: 100%; border-collapse: collapse; font-size: 0.97rem; }
+  th {
+    background: #dce5f0;
+    color: var(--r-blue);
+    padding: 12px 16px;
+    text-align: left;
+    font-weight: 700;
+    border-bottom: 2px solid var(--border);
+  }
+  td {
+    padding: 11px 16px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-muted);
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #f0f4fb; }
+  td:first-child { color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; font-weight: 600; }
+
+  /* BADGES */
+  .badge {
+    display: inline-block;
+    font-size: 0.77rem;
+    padding: 3px 10px;
+    border-radius: 5px;
+    font-weight: 700;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .badge-blue   { background: #dbeafe; color: #1a4a8a; }
+  .badge-green  { background: #dcfce7; color: #1a7f45; }
+  .badge-orange { background: #fee2d5; color: #c0392b; }
+  .badge-purple { background: #ede9fe; color: #6b3fa0; }
+  .badge-yellow { background: #fef9c3; color: #b07d00; }
+
+  /* TIP / WARN BOX */
+  .tip {
+    background: #dcfce7;
+    border: 1px solid #86efac;
+    border-left: 4px solid #1a7f45;
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin: 18px 0;
+    font-size: 0.97rem;
+    color: #1a3a2a;
+  }
+  .tip strong { color: #1a7f45; }
+
+  .warn {
+    background: #fef9c3;
+    border: 1px solid #fde047;
+    border-left: 4px solid #b07d00;
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin: 18px 0;
+    font-size: 0.97rem;
+    color: #3a2800;
+  }
+  .warn strong { color: #b07d00; }
+
+  /* STEP */
+  .steps { display: flex; flex-direction: column; gap: 16px; }
+  .step { display: flex; gap: 16px; align-items: flex-start; }
+  .step-num {
+    width: 34px; height: 34px;
+    background: #e8f0fd;
+    border: 2px solid #1a6bb5;
+    border-radius: 8px;
+    color: #1a4a8a;
+    font-weight: 700;
+    font-size: 0.9rem;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .step-content strong { display: block; color: var(--text); font-size: 1rem; margin-bottom: 3px; }
+  .step-content span { color: var(--text-muted); font-size: 0.95rem; }
+
+  /* SEPARATOR */
+  .sep { border: none; border-top: 2px solid var(--border); margin: 28px 0; }
+
+  /* MINI-BADGE ROW */
+  .tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+
+  /* KEYBOARD SHORTCUT */
+  kbd {
+    background: #eef1f6;
+    border: 1px solid #b8c5d6;
+    border-bottom: 2px solid #9aaec0;
+    border-radius: 5px;
+    padding: 2px 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--text);
+    font-weight: 600;
+  }
+
+  /* FOOTER BRANDING */
+  .footer-brand {
+    text-align: center;
+    padding: 32px 20px 24px;
+    border-top: 1px solid var(--border);
+    margin-top: 40px;
+    color: var(--text-muted);
+    font-size: 0.92rem;
+  }
+  .footer-brand strong { color: var(--r-blue); }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-badge">📊 Cours Complet · Niveau Débutant → Intermédiaire</div>
+  <h1>Apprendre <span>RStudio</span><br>de A à Z</h1>
+  <p>Importation, nettoyage, analyse, visualisation et exportation des données — tout ce qu'il faut pour maîtriser R dans un environnement professionnel.</p>
+
+  <div class="author-card">
+    <div class="author-avatar">KD</div>
+    <div class="author-info">
+      <div class="author-name">KONE Daouda</div>
+      <div class="author-title">Statisticien</div>
+      <div class="author-sub">🏢 Kdaoud Consulting</div>
+      <div class="author-sub">📞 (+225) 07 07 60 58 76 &nbsp;|&nbsp; 01 41 00 38 96</div>
+    </div>
+  </div>
+
+  <div class="hero-stats">
+    <div class="stat"><div class="stat-num">9</div><div class="stat-label">Modules</div></div>
+    <div class="stat"><div class="stat-num">80+</div><div class="stat-label">Exemples de code</div></div>
+    <div class="stat"><div class="stat-num">100%</div><div class="stat-label">Gratuit</div></div>
+  </div>
+</div>
+
+<div class="nav-container">
+  <nav class="nav">
+    <button class="nav-btn active" onclick="show('intro',this)">1. Introduction</button>
+    <button class="nav-btn" onclick="show('types',this)">2. Types de données</button>
+    <button class="nav-btn" onclick="show('structures',this)">3. Structures</button>
+    <button class="nav-btn" onclick="show('packages',this)">4. Packages</button>
+    <button class="nav-btn" onclick="show('import',this)">5. Importation</button>
+    <button class="nav-btn" onclick="show('nettoyage',this)">6. Nettoyage</button>
+    <button class="nav-btn" onclick="show('maths',this)">7. Fonctions Math</button>
+    <button class="nav-btn" onclick="show('graphiques',this)">8. Graphiques</button>
+    <button class="nav-btn" onclick="show('export',this)">9. Exportation</button>
+  </nav>
+</div>
+
+<div class="main">
+
+<!-- =========================================================== 1. INTRO -->
+<div class="section active" id="s-intro">
+  <div class="section-title">
+    <div class="icon" style="background:#e8f0fd;">🖥️</div>
+    Introduction à RStudio
+  </div>
+  <p class="section-sub">RStudio est un environnement de développement intégré (IDE) pour le langage R. Voici tout ce qu'il faut savoir pour démarrer.</p>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">📌 Qu'est-ce que R et RStudio ?</div>
+      <ul>
+        <li><strong>R</strong> : langage de programmation spécialisé en statistiques et analyse de données</li>
+        <li><strong>RStudio</strong> : interface graphique qui facilite l'utilisation de R</li>
+        <li>R est le moteur, RStudio est le tableau de bord</li>
+        <li>Les deux sont <strong>gratuits et open-source</strong></li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-title">🔧 Les 4 panneaux de RStudio</div>
+      <ul>
+        <li><strong>Script</strong> (haut gauche) : où on écrit le code</li>
+        <li><strong>Console</strong> (bas gauche) : où R exécute le code</li>
+        <li><strong>Environnement</strong> (haut droite) : variables et données</li>
+        <li><strong>Fichiers / Plots / Help</strong> (bas droite)</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">⌨️ Raccourcis clavier essentiels</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Action</th><th>Windows / Linux</th><th>macOS</th></tr></thead>
+        <tbody>
+          <tr><td>Exécuter une ligne</td><td><kbd>Ctrl</kbd>+<kbd>Enter</kbd></td><td><kbd>Cmd</kbd>+<kbd>Enter</kbd></td></tr>
+          <tr><td>Opérateur d'assignation &lt;-</td><td><kbd>Alt</kbd>+<kbd>-</kbd></td><td><kbd>Option</kbd>+<kbd>-</kbd></td></tr>
+          <tr><td>Nouveau script</td><td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>N</kbd></td><td><kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>N</kbd></td></tr>
+          <tr><td>Commenter une ligne</td><td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>C</kbd></td><td><kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>C</kbd></td></tr>
+          <tr><td>Autocomplétion</td><td colspan="2"><kbd>Tab</kbd></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">R</span><span class="code-desc">Premiers pas dans R</span></div>
+    <pre><span class="r-comment"># Ceci est un commentaire — R l'ignore</span>
+
+<span class="r-comment"># Assignation d'une variable</span>
+<span class="r-var">x</span> <span class="r-keyword">&lt;-</span> <span class="r-number">42</span>
+<span class="r-var">nom</span> <span class="r-keyword">&lt;-</span> <span class="r-string">"Côte d'Ivoire"</span>
+
+<span class="r-comment"># Afficher une valeur</span>
+<span class="r-func">print</span>(<span class="r-var">x</span>)          <span class="r-comment"># [1] 42</span>
+<span class="r-var">nom</span>                <span class="r-comment"># [1] "Côte d'Ivoire"</span>
+
+<span class="r-comment"># Opérations de base</span>
+<span class="r-number">10</span> + <span class="r-number">5</span>             <span class="r-comment"># [1] 15</span>
+<span class="r-number">100</span> / <span class="r-number">4</span>            <span class="r-comment"># [1] 25</span>
+<span class="r-number">2</span> ^ <span class="r-number">8</span>              <span class="r-comment"># [1] 256</span>
+
+<span class="r-comment"># Aide sur une fonction</span>
+?<span class="r-func">mean</span>
+<span class="r-func">help</span>(<span class="r-string">"sum"</span>)</pre>
+  </div>
+</div>
+
+<!-- =========================================================== 2. TYPES -->
+<div class="section" id="s-types">
+  <div class="section-title">
+    <div class="icon" style="background:#e0f2fe;">🔢</div>
+    Types de données en R
+  </div>
+  <p class="section-sub">R distingue plusieurs types de données fondamentaux. Les connaître est essentiel pour éviter les erreurs d'analyse.</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Type</th><th>Exemple</th><th>Description</th><th>Test</th></tr></thead>
+      <tbody>
+        <tr><td>numeric</td><td>3.14, 42, -5.2</td><td>Nombres réels (décimaux)</td><td><span class="badge badge-blue">is.numeric()</span></td></tr>
+        <tr><td>integer</td><td>1L, 10L</td><td>Nombres entiers (suffixe L)</td><td><span class="badge badge-blue">is.integer()</span></td></tr>
+        <tr><td>character</td><td>"Abidjan", "2024"</td><td>Chaînes de caractères / texte</td><td><span class="badge badge-green">is.character()</span></td></tr>
+        <tr><td>logical</td><td>TRUE, FALSE</td><td>Valeurs booléennes</td><td><span class="badge badge-orange">is.logical()</span></td></tr>
+        <tr><td>factor</td><td>factor("M","F")</td><td>Variables catégorielles</td><td><span class="badge badge-purple">is.factor()</span></td></tr>
+        <tr><td>Date</td><td>as.Date("2024-01-01")</td><td>Dates</td><td><span class="badge badge-yellow">class()</span></td></tr>
+        <tr><td>NA</td><td>NA</td><td>Valeur manquante</td><td><span class="badge badge-orange">is.na()</span></td></tr>
+        <tr><td>NULL</td><td>NULL</td><td>Objet vide / absent</td><td><span class="badge badge-blue">is.null()</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">R</span><span class="code-desc">Types de données — exemples pratiques</span></div>
+    <pre><span class="r-comment"># --- Numeric & Integer ---</span>
+<span class="r-var">population</span> <span class="r-keyword">&lt;-</span> <span class="r-number">27478249</span>       <span class="r-comment"># numeric</span>
+<span class="r-var">annee</span>      <span class="r-keyword">&lt;-</span> <span class="r-number">2024</span><span class="r-keyword">L</span>           <span class="r-comment"># integer</span>
+<span class="r-func">class</span>(<span class="r-var">population</span>)             <span class="r-comment"># "numeric"</span>
+<span class="r-func">class</span>(<span class="r-var">annee</span>)                  <span class="r-comment"># "integer"</span>
+
+<span class="r-comment"># --- Character ---</span>
+<span class="r-var">region</span> <span class="r-keyword">&lt;-</span> <span class="r-string">"Abidjan"</span>
+<span class="r-func">nchar</span>(<span class="r-var">region</span>)                 <span class="r-comment"># 7 (nombre de caractères)</span>
+<span class="r-func">toupper</span>(<span class="r-var">region</span>)               <span class="r-comment"># "ABIDJAN"</span>
+<span class="r-func">tolower</span>(<span class="r-var">region</span>)               <span class="r-comment"># "abidjan"</span>
+
+<span class="r-comment"># --- Logical ---</span>
+<span class="r-var">vaccinated</span> <span class="r-keyword">&lt;-</span> <span class="r-keyword">TRUE</span>
+<span class="r-var">x</span> <span class="r-keyword">&lt;-</span> <span class="r-number">10</span>; <span class="r-var">x</span> > <span class="r-number">5</span>              <span class="r-comment"># TRUE</span>
+<span class="r-func">sum</span>(<span class="r-keyword">c</span>(<span class="r-keyword">TRUE</span>, <span class="r-keyword">FALSE</span>, <span class="r-keyword">TRUE</span>))     <span class="r-comment"># 2 (TRUE = 1)</span>
+
+<span class="r-comment"># --- Factor ---</span>
+<span class="r-var">sexe</span> <span class="r-keyword">&lt;-</span> <span class="r-func">factor</span>(<span class="r-keyword">c</span>(<span class="r-string">"M"</span>,<span class="r-string">"F"</span>,<span class="r-string">"M"</span>,<span class="r-string">"F"</span>))
+<span class="r-func">levels</span>(<span class="r-var">sexe</span>)                  <span class="r-comment"># "F" "M"</span>
+<span class="r-func">table</span>(<span class="r-var">sexe</span>)                   <span class="r-comment"># F:2  M:2</span>
+
+<span class="r-comment"># --- Dates ---</span>
+<span class="r-var">d1</span> <span class="r-keyword">&lt;-</span> <span class="r-func">as.Date</span>(<span class="r-string">"2024-01-15"</span>)
+<span class="r-var">d2</span> <span class="r-keyword">&lt;-</span> <span class="r-func">Sys.Date</span>()              <span class="r-comment"># date du jour</span>
+<span class="r-var">d2</span> - <span class="r-var">d1</span>                       <span class="r-comment"># différence en jours</span>
+<span class="r-func">format</span>(<span class="r-var">d1</span>, <span class="r-string">"%d/%m/%Y"</span>)        <span class="r-comment"># "15/01/2024"</span>
+
+<span class="r-comment"># --- Conversion de types ---</span>
+<span class="r-func">as.numeric</span>(<span class="r-string">"3.14"</span>)           <span class="r-comment"># 3.14</span>
+<span class="r-func">as.character</span>(<span class="r-number">42</span>)              <span class="r-comment"># "42"</span>
+<span class="r-func">as.logical</span>(<span class="r-number">1</span>)                 <span class="r-comment"># TRUE</span></pre>
+  </div>
+</div>
+
+<!-- =========================================================== 3. STRUCTURES -->
+<div class="section" id="s-structures">
+  <div class="section-title">
+    <div class="icon" style="background:#ede9fe;">🏗️</div>
+    Structures de données
+  </div>
+  <p class="section-sub">Les structures de données organisent les valeurs. Maîtriser les vecteurs, matrices, listes et data frames est indispensable.</p>
+
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-title">📊 Vecteur</div>
+      <p>Séquence 1D d'éléments du <em>même type</em>. Structure de base de R.</p>
+      <div class="tag-row"><span class="badge badge-blue">1 dimension</span><span class="badge badge-green">type unique</span></div>
+    </div>
+    <div class="card">
+      <div class="card-title">📋 Data Frame</div>
+      <p>Tableau 2D : colonnes de types différents. Équivalent d'un tableau Excel.</p>
+      <div class="tag-row"><span class="badge badge-purple">2 dimensions</span><span class="badge badge-yellow">types mixtes</span></div>
+    </div>
+    <div class="card">
+      <div class="card-title">📦 Liste</div>
+      <p>Collection d'éléments de <em>types et structures différents</em>.</p>
+      <div class="tag-row"><span class="badge badge-orange">hétérogène</span><span class="badge badge-blue">imbriqué</span></div>
+    </div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">R</span><span class="code-desc">Vecteurs</span></div>
+    <pre><span class="r-comment"># Création</span>
+<span class="r-var">ages</span>    <span class="r-keyword">&lt;-</span> <span class="r-func">c</span>(<span class="r-number">25</span>, <span class="r-number">30</span>, <span class="r-number">18</span>, <span class="r-number">45</span>, <span class="r-number">22</span>)
+<span class="r-var">regions</span> <span class="r-keyword">&lt;-</span> <span class="r-func">c</span>(<span class="r-string">"Abidjan"</span>, <span class="r-string">"Bouaké"</span>, <span class="r-string">"Yamoussoukro"</span>)
+<span class="r-var">seq1</span>    <span class="r-keyword">&lt;-</span> <span class="r-number">1</span>:<span class="r-number">10</span>              <span class="r-comment"># 1 2 3 ... 10</span>
+<span class="r-var">seq2</span>    <span class="r-keyword">&lt;-</span> <span class="r-func">seq</span>(<span class="r-number">0</span>, <span class="r-number">100</span>, by=<span class="r-number">10</span>) <span class="r-comment"># 0 10 20 ... 100</span>
+<span class="r-var">rep1</span>    <span class="r-keyword">&lt;-</span> <span class="r-func">rep</span>(<span class="r-number">0</span>, <span class="r-number">5</span>)          <span class="r-comment"># 0 0 0 0 0</span>
+
+<span class="r-comment"># Accès par indice (R commence à 1 !)</span>
+<span class="r-var">ages</span>[<span class="r-number">1</span>]                       <span class="r-comment"># 25</span>
+<span class="r-var">ages</span>[<span class="r-number">2</span>:<span class="r-number">4</span>]                     <span class="r-comment"># 30 18 45</span>
+<span class="r-var">ages</span>[<span class="r-var">ages</span> > <span class="r-number">20</span>]               <span class="r-comment"># 25 30 45 22</span>
+
+<span class="r-comment"># Opérations vectorisées</span>
+<span class="r-var">ages</span> * <span class="r-number">2</span>                       <span class="r-comment"># multiplie chaque élément</span>
+<span class="r-func">length</span>(<span class="r-var">ages</span>)                   <span class="r-comment"># 5</span>
+<span class="r-func">sum</span>(<span class="r-var">ages</span>); <span class="r-func">mean</span>(<span class="r-var">ages</span>)         <span class="r-comment"># 140 ; 28</span></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">R</span><span class="code-desc">Data Frame — le plus utilisé en analyse de données</span></div>
+    <pre><span class="r-comment"># Créer un data frame</span>
+<span class="r-var">df</span> <span class="r-keyword">&lt;-</span> <span class="r-func">data.frame</span>(
+  district   = <span class="r-func">c</span>(<span class="r-string">"Abidjan"</span>, <span class="r-string">"Bouaké"</span>, <span class="r-string">"Daloa"</span>),
+  population = <span class="r-func">c</span>(<span class="r-number">5000000</span>, <span class="r-number">800000</span>, <span class="r-number">300000</span>),
+  vaccines   = <span class="r-func">c</span>(<span class="r-number">4200000</span>, <span class="r-number">620000</span>, <span class="r-number">210000</span>),
+  stringsAsFactors = <span class="r-keyword">FALSE</span>
+)
+
+<span class="r-comment"># Explorer un data frame</span>
+<span class="r-func">head</span>(<span class="r-var">df</span>)                       <span class="r-comment"># premières lignes</span>
+<span class="r-func">tail</span>(<span class="r-var">df</span>, <span class="r-number">3</span>)                    <span class="r-comment"># 3 dernières lignes</span>
+<span class="r-func">str</span>(<span class="r-var">df</span>)                        <span class="r-comment"># structure</span>
+<span class="r-func">dim</span>(<span class="r-var">df</span>)                        <span class="r-comment"># lignes x colonnes</span>
+<span class="r-func">nrow</span>(<span class="r-var">df</span>); <span class="r-func">ncol</span>(<span class="r-var">df</span>)            <span class="r-comment"># 3 ; 3</span>
+<span class="r-func">names</span>(<span class="r-var">df</span>)                      <span class="r-comment"># noms des colonnes</span>
+<span class="r-func">summary</span>(<span class="r-var">df</span>)                    <span class="r-comment"># statistiques résumées</span>
+
+<span class="r-comment"># Accès aux colonnes</span>
+<span class="r-var">df</span>$district                    <span class="r-comment"># vecteur district</span>
+<span class="r-var">df</span>[, <span class="r-string">"population"</span>]            <span class="r-comment"># même chose</span>
+<span class="r-var">df</span>[<span class="r-number">1</span>, ]                        <span class="r-comment"># première ligne</span>
+<span class="r-var">df</span>[<span class="r-var">df</span>$population > <span class="r-number">500000</span>, ]  <span class="r-comment"># filtrage</span>
+
+<span class="r-comment"># Ajouter une colonne calculée</span>
+<span class="r-var">df</span>$taux_couverture <span class="r-keyword">&lt;-</span> <span class="r-func">round</span>(<span class="r-var">df</span>$vaccines / <span class="r-var">df</span>$population * <span class="r-number">100</span>, <span class="r-number">1</span>)</pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">R</span><span class="code-desc">Matrices et Listes</span></div>
+    <pre><span class="r-comment"># Matrice (même type pour tous les éléments)</span>
+<span class="r-var">m</span> <span class="r-keyword">&lt;-</span> <span class="r-func">matrix</span>(<span class="r-number">1</span>:<span class="r-number">9</span>, nrow=<span class="r-number">3</span>, ncol=<span class="r-number">3</span>)
+<span class="r-var">m</span>[<span class="r-number">2</span>, <span class="r-number">3</span>]                        <span class="r-comment"># ligne 2, colonne 3</span>
+<span class="r-func">t</span>(<span class="r-var">m</span>)                           <span class="r-comment"># transposée</span>
+<span class="r-var">m</span> %*% <span class="r-var">m</span>                       <span class="r-comment"># produit matriciel</span>
+
+<span class="r-comment"># Liste (éléments hétérogènes)</span>
+<span class="r-var">patient</span> <span class="r-keyword">&lt;-</span> <span class="r-func">list</span>(
+  id       = <span class="r-number">001</span>,
+  nom      = <span class="r-string">"Kouassi"</span>,
+  ages     = <span class="r-func">c</span>(<span class="r-number">34</span>, <span class="r-number">28</span>, <span class="r-number">45</span>),
+  vaccine  = <span class="r-keyword">TRUE</span>
+)
+<span class="r-var">patient</span>$nom                    <span class="r-comment"># "Kouassi"</span>
+<span class="r-var">patient</span>[[<span class="r-string">"ages"</span>]]             <span class="r-comment"># c(34, 28, 45)</span></pre>
+  </div>
+</div>
+
+<!-- =========================================================== 4. PACKAGES -->
+<div class="section" id="s-packages">
+  <div class="section-title">
+    <div class="icon" style="background:#dcfce7;">📦</div>
+    Packages et bibliothèques
+  </div>
+  <p class="section-sub">Les packages étendent les capacités de R. Le Tidyverse est l'écosystème de référence pour l'analyse de données moderne.</p>
+
+  <div class="card">
+    <div class="card-title">🔧 Installer et charger un package</div>
+    <div class="code-block" style="margin-top:8px;">
+      <div class="code-header"><span class="code-lang">R</span></div>
+      <pre><span class="r-comment"># Installer (une seule fois)</span>
+<span class="r-func">install.packages</span>(<span class="r-string">"tidyverse"</span>)
+<span class="r-func">install.packages</span>(<span class="r-func">c</span>(<span class="r-string">"readxl"</span>, <span class="r-string">"writexl"</span>, <span class="r-string">"janitor"</span>))
+
+<span class="r-comment"># Charger (à chaque session)</span>
+<span class="r-func">library</span>(tidyverse)
+<span class="r-func">library</span>(readxl)
+
+<span class="r-comment"># Voir les packages installés</span>
+<span class="r-func">installed.packages</span>()[, <span class="r-string">"Package"</span>]
+
+<span class="r-comment"># Mettre à jour tous les packages</span>
+<span class="r-func">update.packages</span>(ask = <span class="r-keyword">FALSE</span>)</pre>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Package</th><th>Usage principal</th><th>Fonctions clés</th></tr></thead>
+      <tbody>
+        <tr><td>dplyr</td><td>Manipulation de données</td><td>filter, select, mutate, group_by, summarise</td></tr>
+        <tr><td>ggplot2</td><td>Visualisation</td><td>ggplot, aes, geom_*</td></tr>
+        <tr><td>tidyr</td><td>Restructurer les données</td><td>pivot_longer, pivot_wider, separate, unite</td></tr>
+        <tr><td>readxl</td><td>Lire fichiers Excel</td><td>read_excel, excel_sheets</td></tr>
+        <tr><td>writexl</td><td>Écrire fichiers Excel</td><td>write_xlsx</td></tr>
+        <tr><td>readr</td><td>Lire fichiers CSV</td><td>read_csv, read_delim</td></tr>
+        <tr><td>janitor</td><td>Nettoyage de données</td><td>clean_names, tabyl, remove_empty</td></tr>
+        <tr><td>lubridate</td><td>Manipulation de dates</td><td>ymd, dmy, year, month, day</td></tr>
+        <tr><td>stringr</td><td>Manipulation de texte</td><td>str_detect, str_replace, str_trim</td></tr>
+        <tr><td>forcats</td><td>Manipulation de facteurs</td><td>fct_relevel, fct_recode</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="tip"><strong>💡 Conseil :</strong> <code>library(tidyverse)</code> charge automatiquement : ggplot2, dplyr, tidyr, readr, purrr, tibble, stringr, et forcats.</div>
+</div>
+
+<!-- =========================================================== 5. IMPORTATION -->
+<div class="section" id="s-import">
+  <div class="section-title">
+    <div class="icon" style="background:#fef9c3;">📥</div>
+    Importation des données
+  </div>
+  <p class="section-sub">R peut lire presque tous les formats de fichiers. Voici les méthodes pour les formats les plus courants.</p>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">R</span><span class="code-desc">Lire des fichiers CSV</span></div>
+    <pre><span class="r-func">library</span>(readr)
+
+<span class="r-comment"># CSV standard (séparateur virgule)</span>
+<span class="r-var">df</span> <span class="r-keyword">&lt;-</span> <span class="r-func">read_csv</span>(<span class="r-string">"donnees.csv"</span>)
+
+<span class="r-comment"># CSV européen (séparateur point-virgule, décimal virgule)</span>
+<span class="r-var">df</span> <span class="r-keyword">&lt;-</span> <span class="r-func">read_csv2</span>(<span class="r-string">"donnees.csv"</span>)
+
+<span class="r-comment"># Préciser l'encodage (important pour les accents)</span>
+<span class="r-var">df</span> <span class="r-keyword">&lt;-</span> <span class="r-func">read_csv</span>(<span class="r-string">"donnees.csv"</span>, locale = <span class="r-func">locale</span>(encoding = <span class="r-string">"UTF-8"</span>))
+
+<span class="r-comment"># Sauter des lignes d'en-tête</span>
+<span class="r-var">df</span> <span class="r-keyword">&lt;-</span> <span class="r-func">read_csv</span>(<span class="r-string">"donnees.csv"</span>, skip = <span class="r-number">2</span>)
+
+<span class="r-comment"># Préciser les types de colonnes</span>
+<span class="r-var">df</span> <span class="r-keyword">&lt;-</span> <span class="r-func">read_csv</span>(<span class="r-string">"donnees.csv"</span>, col_types = <span class="r-func">cols</span>(
+  district = <span class="r-func">col_character</span>(),
+  annee    = <span class="r-func">col_integer</span>(),
+  valeur   = <span class="r-func">col_double</span>()
+))</pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">R</span><span class="code-desc">Lire des fichiers Excel (.xlsx, .xls)</span></div>
+    <pre><span class="r-func">library</span>(readxl)
+
+<span class="r-comment"># Lire la première feuille</span>
+<span class="r-var">df</span> <span class="r-keyword">&lt;-</span> <span class="r-func">read_excel</span>(<span class="r-string">"données_vaccination.xlsx"</span>)
+
+<span class="r-comment"># Lire une feuille spécifique par nom</span>
+<span class="r-var">df</span> <span class="r-keyword">&lt;-</span> <span class="r-func">read_excel</span>(<span class="r-string">"données.xlsx"</span>, sheet = <span class="r-string">"DRS_Abidjan"</span>)
+
+<span class="r-comment"># Lire une feuille par numéro</span>
+<span class="r-var">df</span> <span class="r-keyword">&lt;-</span> <span class="r-func">read_excel</span>(<span class="r-string">"données.xlsx"</span>, sheet = <span class="r-number">2</span>)
+
+<span class="r-comment"># Lire une plage de cellules</span>
+<span class="r-var">df</span> <span class="r-keyword">&lt;-</span> <span class="r-func">read_excel</span>(<span class="r-string">"données.xlsx"</span>, range = <span class="r-string">"A1:F50"</span>)
+
+<span class="r-comment"># Voir tous les noms de feuilles</span>
+<span class="r-func">excel_sheets</span>(<span class="r-string">"données.xlsx"</span>)
+
+<span class="r-comment"># Importer TOUTES les feuilles dans une liste</span>
+<span class="r-var">toutes_feuilles</span> <span class="r-keyword">&lt;-</span> <span class="r-func">lapply</span>(<span class="r-func">excel_sheets</span>(<span class="r-string">"données.xlsx"</span>),
+                          <span class="r-func">read_excel</span>, path = <span class="r-string">"données.xlsx"</span>)</pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">R</span><span class="code-desc">Autres formats + vérification après import</span></div>
+    <pre><span class="r-comment"># --- Fichier texte délimité ---</span>
+<span class="r-var">df</span> <span class="r-keyword">&lt;-</span> <span class="r-func">read.table</span>(<span class="r-string">"fichier.txt"</span>, header=<span class="r-keyword">TRUE</span>, sep=<span class="r-string">"\t"</span>)
+
+<span class="r-comment"># --- RDS (format natif R) ---</span>
+<span class="r-var">df</span> <span class="r-keyword">&lt;-</span> <span class="r-func">readRDS</span>(<span class="r-string">"données.rds"</span>)
+
+<span class="r-comment"># --- Depuis un URL ---</span>
+<span class="r-var">df</span> <span class="r-keyword">&lt;-</span> <span class="r-func">read_csv</span>(<span class="r-string">"https://exemple.com/données.csv"</span>)
+
+<span class="r-comment"># ====== Vérification après import ======</span>
+<span class="r-func">dim</span>(<span class="r-var">df</span>)          <span class="r-comment"># dimensions</span>
+<span class="r-func">str</span>(<span class="r-var">df</span>)          <span class="r-comment"># types de colonnes</span>
+<span class="r-func">head</span>(<span class="r-var">df</span>)         <span class="r-comment"># aperçu</span>
+<span class="r-func">summary</span>(<span class="r-var">df</span>)      <span class="r-comment"># statistiques</span>
+<span class="r-func">colSums</span>(<span class="r-func">is.na</span>(<span class="r-var">df</span>)) <span class="r-comment"># valeurs manquantes par colonne</span></pre>
+  </div>
+</div>
+
+<!-- =========================================================== 6. NETTOYAGE -->
+<div class="section" id="s-nettoyage">
+  <div class="section-title">
+    <div class="icon" style="background:#fee2d5;">🧹</div>
+    Nettoyage des données
+  </div>
+  <p class="section-sub">Le nettoyage représente souvent 70% du travail d'analyse. Voici les opérations essentielles avec dplyr, tidyr et janitor.</p>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">R</span><span class="code-desc">dplyr — manipulation et nettoyage</span></div>
+    <pre><span class="r-func">library</span>(dplyr)
+<span class="r-func">library</span>(janitor)
+
+<span class="r-comment"># Nettoyer les noms de colonnes (espaces, accents, majuscules)</span>
+<span class="r-var">df</span> <span class="r-keyword">&lt;-</span> <span class="r-var">df</span> |> <span class="r-func">clean_names</span>()       <span class="r-comment"># "Nom Région" → "nom_region"</span>
+
+<span class="r-comment"># Sélectionner des colonnes</span>
+<span class="r-var">df2</span> <span class="r-keyword">&lt;-</span> <span class="r-var">df</span> |> <span class="r-func">select</span>(district, annee, valeur)
+<span class="r-var">df2</span> <span class="r-keyword">&lt;-</span> <span class="r-var">df</span> |> <span class="r-func">select</span>(-colonne_inutile)   <span class="r-comment"># enlever une colonne</span>
+
+<span class="r-comment"># Renommer des colonnes</span>
+<span class="r-var">df</span> <span class="r-keyword">&lt;-</span> <span class="r-var">df</span> |> <span class="r-func">rename</span>(district = nom_district, taux = couverture_pct)
+
+<span class="r-comment"># Filtrer des lignes</span>
+<span class="r-var">df</span> |> <span class="r-func">filter</span>(annee == <span class="r-number">2023</span>)
+<span class="r-var">df</span> |> <span class="r-func">filter</span>(region == <span class="r-string">"Abidjan"</span> & taux > <span class="r-number">80</span>)
+<span class="r-var">df</span> |> <span class="r-func">filter</span>(!<span class="r-func">is.na</span>(valeur))           <span class="r-comment"># exclure les NA</span>
+
+<span class="r-comment"># Créer / modifier des colonnes</span>
+<span class="r-var">df</span> <span class="r-keyword">&lt;-</span> <span class="r-var">df</span> |> <span class="r-func">mutate</span>(
+  taux_pct  = vaccines / population * <span class="r-number">100</span>,
+  annee_cat = <span class="r-func">if_else</span>(annee >= <span class="r-number">2020</span>, <span class="r-string">"récent"</span>, <span class="r-string">"ancien"</span>)
+)
+
+<span class="r-comment"># Trier</span>
+<span class="r-var">df</span> |> <span class="r-func">arrange</span>(<span class="r-func">desc</span>(taux_pct))           <span class="r-comment"># décroissant</span>
+<span class="r-var">df</span> |> <span class="r-func">arrange</span>(region, annee)             <span class="r-comment"># multi-colonne</span>
+
+<span class="r-comment"># Agréger / résumer</span>
+<span class="r-var">df</span> |>
+  <span class="r-func">group_by</span>(region) |>
+  <span class="r-func">summarise</span>(
+    moy_taux  = <span class="r-func">mean</span>(taux, na.rm = <span class="r-keyword">TRUE</span>),
+    n_dist    = <span class="r-func">n</span>(),
+    max_taux  = <span class="r-func">max</span>(taux, na.rm = <span class="r-keyword">TRUE</span>)
+  )</pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">R</span><span class="code-desc">Valeurs manquantes (NA)</span></div>
+    <pre><span class="r-comment"># Détecter les NA</span>
+<span class="r-func">is.na</span>(<span class="r-var">df</span>$valeur)               <span class="r-comment"># vecteur logique</span>
+<span class="r-func">sum</span>(<span class="r-func">is.na</span>(<span class="r-var">df</span>$valeur))          <span class="r-comment"># nombre de NA</span>
+<span class="r-func">colSums</span>(<span class="r-func">is.na</span>(<span class="r-var">df</span>))             <span class="r-comment"># NA par colonne</span>
+
+<span class="r-comment"># Supprimer les lignes avec NA</span>
+<span class="r-var">df_propre</span> <span class="r-keyword">&lt;-</span> <span class="r-func">na.omit</span>(<span class="r-var">df</span>)
+<span class="r-var">df_propre</span> <span class="r-keyword">&lt;-</span> <span class="r-var">df</span> |> <span class="r-func">drop_na</span>()   <span class="r-comment"># tidyr</span>
+
+<span class="r-comment"># Remplacer les NA</span>
+<span class="r-var">df</span> <span class="r-keyword">&lt;-</span> <span class="r-var">df</span> |> <span class="r-func">mutate</span>(
+  valeur = <span class="r-func">replace_na</span>(valeur, <span class="r-number">0</span>),          <span class="r-comment"># remplacer par 0</span>
+  valeur = <span class="r-func">if_else</span>(<span class="r-func">is.na</span>(valeur),
+                   <span class="r-func">mean</span>(valeur, na.rm=<span class="r-keyword">TRUE</span>), <span class="r-comment"># remplacer par moy</span>
+                   valeur)
+)
+
+<span class="r-comment"># Supprimer les doublons</span>
+<span class="r-var">df</span> <span class="r-keyword">&lt;-</span> <span class="r-var">df</span> |> <span class="r-func">distinct</span>()          <span class="r-comment"># toutes colonnes</span>
+<span class="r-var">df</span> <span class="r-keyword">&lt;-</span> <span class="r-var">df</span> |> <span class="r-func">distinct</span>(id, .keep_all=<span class="r-keyword">TRUE</span>)</pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">R</span><span class="code-desc">Manipulation de texte avec stringr</span></div>
+    <pre><span class="r-func">library</span>(stringr)
+
+<span class="r-var">df</span> <span class="r-keyword">&lt;-</span> <span class="r-var">df</span> |> <span class="r-func">mutate</span>(
+  district = <span class="r-func">str_trim</span>(district),          <span class="r-comment"># enlever espaces</span>
+  district = <span class="r-func">str_to_upper</span>(district),       <span class="r-comment"># MAJUSCULES</span>
+  district = <span class="r-func">str_replace_all</span>(             <span class="r-comment"># remplacer</span>
+               district, <span class="r-string">"-"</span>, <span class="r-string">" "</span>),
+  district = <span class="r-func">str_remove</span>(district, <span class="r-string">"DDS "</span>)  <span class="r-comment"># supprimer préfixe</span>
+)
+
+<span class="r-comment"># Détecter un motif</span>
+<span class="r-var">df</span> |> <span class="r-func">filter</span>(<span class="r-func">str_detect</span>(district, <span class="r-string">"Abidjan"</span>))
+
+<span class="r-comment"># Manipulation de dates</span>
+<span class="r-func">library</span>(lubridate)
+<span class="r-var">df</span> <span class="r-keyword">&lt;-</span> <span class="r-var">df</span> |> <span class="r-func">mutate</span>(
+  date     = <span class="r-func">dmy</span>(date_texte),              <span class="r-comment"># "15/01/2024"</span>
+  annee    = <span class="r-func">year</span>(date),
+  mois     = <span class="r-func">month</span>(date, label=<span class="r-keyword">TRUE</span>),
+  trimestre= <span class="r-func">quarter</span>(date)
+)</pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">R</span><span class="code-desc">Fusionner des tables (jointures)</span></div>
+    <pre><span class="r-comment"># Jointure gauche (garder toutes les lignes de df1)</span>
+<span class="r-var">df_final</span> <span class="r-keyword">&lt;-</span> <span class="r-func">left_join</span>(<span class="r-var">df1</span>, <span class="r-var">df2</span>, by = <span class="r-string">"district"</span>)
+
+<span class="r-comment"># Clé composite</span>
+<span class="r-var">df_final</span> <span class="r-keyword">&lt;-</span> <span class="r-func">left_join</span>(<span class="r-var">df1</span>, <span class="r-var">df2</span>,
+              by = <span class="r-func">c</span>(<span class="r-string">"district"</span>, <span class="r-string">"annee"</span>))
+
+<span class="r-comment"># Empiler des data frames (mêmes colonnes)</span>
+<span class="r-var">df_tout</span> <span class="r-keyword">&lt;-</span> <span class="r-func">bind_rows</span>(<span class="r-var">df_2022</span>, <span class="r-var">df_2023</span>, <span class="r-var">df_2024</span>)
+
+<span class="r-comment"># Pivoter long → large</span>
+<span class="r-var">df_large</span> <span class="r-keyword">&lt;-</span> <span class="r-var">df_long</span> |> <span class="r-func">pivot_wider</span>(
+  names_from  = annee,
+  values_from = valeur
+)
+
+<span class="r-comment"># Pivoter large → long</span>
+<span class="r-var">df_long</span> <span class="r-keyword">&lt;-</span> <span class="r-var">df_large</span> |> <span class="r-func">pivot_longer</span>(
+  cols      = <span class="r-func">starts_with</span>(<span class="r-string">"2"</span>),
+  names_to  = <span class="r-string">"annee"</span>,
+  values_to = <span class="r-string">"valeur"</span>
+)</pre>
+  </div>
+</div>
+
+<!-- =========================================================== 7. MATHS -->
+<div class="section" id="s-maths">
+  <div class="section-title">
+    <div class="icon" style="background:#fef9c3;">🧮</div>
+    Fonctions mathématiques et statistiques
+  </div>
+  <p class="section-sub">R est un langage statistique. Voici les fonctions les plus utiles pour analyser des données de santé ou toute donnée quantitative.</p>
+
+  <div class="grid-2">
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">R</span><span class="code-desc">Fonctions de base</span></div>
+      <pre><span class="r-var">x</span> <span class="r-keyword">&lt;-</span> <span class="r-func">c</span>(<span class="r-number">12</span>, <span class="r-number">45</span>, <span class="r-number">7</span>, <span class="r-number">89</span>, <span class="r-number">23</span>, <span class="r-number">56</span>)
+
+<span class="r-func">sum</span>(<span class="r-var">x</span>)        <span class="r-comment"># 232</span>
+<span class="r-func">mean</span>(<span class="r-var">x</span>)       <span class="r-comment"># 38.67</span>
+<span class="r-func">median</span>(<span class="r-var">x</span>)     <span class="r-comment"># 34</span>
+<span class="r-func">min</span>(<span class="r-var">x</span>)        <span class="r-comment"># 7</span>
+<span class="r-func">max</span>(<span class="r-var">x</span>)        <span class="r-comment"># 89</span>
+<span class="r-func">range</span>(<span class="r-var">x</span>)      <span class="r-comment"># 7 89</span>
+<span class="r-func">var</span>(<span class="r-var">x</span>)        <span class="r-comment"># variance</span>
+<span class="r-func">sd</span>(<span class="r-var">x</span>)         <span class="r-comment"># écart-type</span>
+<span class="r-func">abs</span>(<span class="r-var">x</span>)        <span class="r-comment"># valeur absolue</span>
+<span class="r-func">sqrt</span>(<span class="r-var">x</span>)       <span class="r-comment"># racine carrée</span>
+<span class="r-func">log</span>(<span class="r-var">x</span>)        <span class="r-comment"># log naturel</span>
+<span class="r-func">log10</span>(<span class="r-var">x</span>)      <span class="r-comment"># log base 10</span>
+<span class="r-func">exp</span>(<span class="r-var">x</span>)        <span class="r-comment"># exponentielle</span>
+<span class="r-func">round</span>(<span class="r-var">x</span>, <span class="r-number">2</span>)   <span class="r-comment"># arrondi 2 décimales</span>
+<span class="r-func">ceiling</span>(<span class="r-var">x</span>)    <span class="r-comment"># arrondi supérieur</span>
+<span class="r-func">floor</span>(<span class="r-var">x</span>)      <span class="r-comment"># arrondi inférieur</span></pre>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">R</span><span class="code-desc">Statistiques descriptives</span></div>
+      <pre><span class="r-comment"># Quantiles / percentiles</span>
+<span class="r-func">quantile</span>(<span class="r-var">x</span>, <span class="r-number">0.25</span>)            <span class="r-comment"># Q1</span>
+<span class="r-func">quantile</span>(<span class="r-var">x</span>, <span class="r-func">c</span>(<span class="r-number">0.25</span>,<span class="r-number">0.5</span>,<span class="r-number">0.75</span>)) <span class="r-comment"># Q1 Q2 Q3</span>
+<span class="r-func">IQR</span>(<span class="r-var">x</span>)                       <span class="r-comment"># interquartile</span>
+
+<span class="r-comment"># Résumé complet</span>
+<span class="r-func">summary</span>(<span class="r-var">x</span>)
+
+<span class="r-comment"># Corrélation</span>
+<span class="r-func">cor</span>(<span class="r-var">x</span>, <span class="r-var">y</span>)                    <span class="r-comment"># Pearson</span>
+<span class="r-func">cor</span>(<span class="r-var">x</span>, <span class="r-var">y</span>, method=<span class="r-string">"spearman"</span>) <span class="r-comment"># Spearman</span>
+
+<span class="r-comment"># Tests statistiques</span>
+<span class="r-func">t.test</span>(<span class="r-var">x</span>, <span class="r-var">y</span>)                 <span class="r-comment"># test T Student</span>
+<span class="r-func">chisq.test</span>(<span class="r-func">table</span>(<span class="r-var">df</span>$sexe,     <span class="r-comment"># test Chi2</span>
+                 <span class="r-var">df</span>$vaccin))
+<span class="r-func">wilcox.test</span>(<span class="r-var">x</span>, <span class="r-var">y</span>)            <span class="r-comment"># Mann-Whitney</span>
+
+<span class="r-comment"># Régression linéaire</span>
+<span class="r-var">modele</span> <span class="r-keyword">&lt;-</span> <span class="r-func">lm</span>(taux ~ annee + population, data=<span class="r-var">df</span>)
+<span class="r-func">summary</span>(<span class="r-var">modele</span>)
+<span class="r-func">coef</span>(<span class="r-var">modele</span>)
+<span class="r-func">fitted</span>(<span class="r-var">modele</span>)                <span class="r-comment"># valeurs prédites</span></pre>
+    </div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">R</span><span class="code-desc">Agrégations avec dplyr (cas pratique santé)</span></div>
+    <pre><span class="r-func">library</span>(dplyr)
+
+<span class="r-comment"># Taux de couverture vaccinale par région et année</span>
+<span class="r-var">synthese</span> <span class="r-keyword">&lt;-</span> <span class="r-var">df</span> |>
+  <span class="r-func">group_by</span>(region, annee) |>
+  <span class="r-func">summarise</span>(
+    total_pop     = <span class="r-func">sum</span>(population, na.rm = <span class="r-keyword">TRUE</span>),
+    total_vacc    = <span class="r-func">sum</span>(vaccines,   na.rm = <span class="r-keyword">TRUE</span>),
+    taux_cov      = <span class="r-func">round</span>(total_vacc / total_pop * <span class="r-number">100</span>, <span class="r-number">1</span>),
+    nb_districts  = <span class="r-func">n_distinct</span>(district),
+    .groups       = <span class="r-string">"drop"</span>
+  ) |>
+  <span class="r-func">arrange</span>(<span class="r-func">desc</span>(taux_cov))
+
+<span class="r-comment"># Pourcentages cumulés</span>
+<span class="r-var">df</span> <span class="r-keyword">&lt;-</span> <span class="r-var">df</span> |> <span class="r-func">mutate</span>(
+  cumul = <span class="r-func">cumsum</span>(valeur),
+  rang  = <span class="r-func">rank</span>(<span class="r-func">desc</span>(valeur)),
+  pct   = valeur / <span class="r-func">sum</span>(valeur) * <span class="r-number">100</span>
+)</pre>
+  </div>
+</div>
+
+<!-- =========================================================== 8. GRAPHIQUES -->
+<div class="section" id="s-graphiques">
+  <div class="section-title">
+    <div class="icon" style="background:#ede9fe;">📈</div>
+    Graphiques avec ggplot2
+  </div>
+  <p class="section-sub">ggplot2 est le standard de la visualisation en R. La logique est toujours la même : données + esthétiques + géométries.</p>
+
+  <div class="card">
+    <div class="card-title">🧱 La grammaire de ggplot2</div>
+    <div class="code-block" style="margin-top:8px">
+      <div class="code-header"><span class="code-lang">R</span></div>
+      <pre><span class="r-func">ggplot</span>(data = <span class="r-var">df</span>,            <span class="r-comment"># 1. les données</span>
+       aes(x = district,          <span class="r-comment"># 2. les esthétiques (x, y, color...)</span>
+           y = taux,
+           fill = region)) +
+  <span class="r-func">geom_col</span>() +               <span class="r-comment"># 3. la géométrie (barres)</span>
+  <span class="r-func">labs</span>(title  = <span class="r-string">"Titre"</span>,       <span class="r-comment"># 4. étiquettes</span>
+       x      = <span class="r-string">"District"</span>,
+       y      = <span class="r-string">"Taux (%)"</span>) +
+  <span class="r-func">theme_minimal</span>()             <span class="r-comment"># 5. thème visuel</span></pre>
+    </div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">R</span><span class="code-desc">Types de graphiques essentiels</span></div>
+    <pre><span class="r-func">library</span>(ggplot2)
+
+<span class="r-comment"># ---- HISTOGRAMME ----</span>
+<span class="r-func">ggplot</span>(<span class="r-var">df</span>, <span class="r-func">aes</span>(x = age)) +
+  <span class="r-func">geom_histogram</span>(bins = <span class="r-number">20</span>, fill = <span class="r-string">"#2986cc"</span>, color = <span class="r-string">"white"</span>) +
+  <span class="r-func">labs</span>(title = <span class="r-string">"Distribution des âges"</span>)
+
+<span class="r-comment"># ---- BARRES ----</span>
+<span class="r-func">ggplot</span>(<span class="r-var">df</span>, <span class="r-func">aes</span>(x = region, y = taux, fill = region)) +
+  <span class="r-func">geom_col</span>() +
+  <span class="r-func">coord_flip</span>() +               <span class="r-comment"># barres horizontales</span>
+  <span class="r-func">theme_minimal</span>() +
+  <span class="r-func">theme</span>(legend.position = <span class="r-string">"none"</span>)
+
+<span class="r-comment"># ---- COURBE TEMPORELLE ----</span>
+<span class="r-func">ggplot</span>(<span class="r-var">df</span>, <span class="r-func">aes</span>(x = annee, y = taux, color = district, group = district)) +
+  <span class="r-func">geom_line</span>(linewidth = <span class="r-number">1.2</span>) +
+  <span class="r-func">geom_point</span>(size = <span class="r-number">3</span>) +
+  <span class="r-func">labs</span>(title = <span class="r-string">"Évolution du taux de couverture"</span>)
+
+<span class="r-comment"># ---- NUAGE DE POINTS ----</span>
+<span class="r-func">ggplot</span>(<span class="r-var">df</span>, <span class="r-func">aes</span>(x = population, y = taux, color = region)) +
+  <span class="r-func">geom_point</span>(size = <span class="r-number">3</span>, alpha = <span class="r-number">0.7</span>) +
+  <span class="r-func">geom_smooth</span>(method = <span class="r-string">"lm"</span>, se = <span class="r-keyword">TRUE</span>) +   <span class="r-comment"># droite régression</span>
+  <span class="r-func">scale_x_log10</span>()              <span class="r-comment"># axe logarithmique</span>
+
+<span class="r-comment"># ---- BOÎTE À MOUSTACHES ----</span>
+<span class="r-func">ggplot</span>(<span class="r-var">df</span>, <span class="r-func">aes</span>(x = region, y = taux, fill = region)) +
+  <span class="r-func">geom_boxplot</span>() +
+  <span class="r-func">geom_jitter</span>(alpha = <span class="r-number">0.3</span>, width = <span class="r-number">0.2</span>)  <span class="r-comment"># points individuels</span>
+
+<span class="r-comment"># ---- FACETTES (petits multiples) ----</span>
+<span class="r-func">ggplot</span>(<span class="r-var">df</span>, <span class="r-func">aes</span>(x = annee, y = taux)) +
+  <span class="r-func">geom_line</span>() +
+  <span class="r-func">facet_wrap</span>(~region, ncol = <span class="r-number">3</span>)  <span class="r-comment"># un graphique par région</span></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">R</span><span class="code-desc">Personnalisation et exportation des graphiques</span></div>
+    <pre><span class="r-comment"># Thèmes prédéfinis</span>
+<span class="r-var">g</span> + <span class="r-func">theme_minimal</span>()
+<span class="r-var">g</span> + <span class="r-func">theme_bw</span>()
+<span class="r-var">g</span> + <span class="r-func">theme_classic</span>()
+
+<span class="r-comment"># Couleurs personnalisées</span>
+<span class="r-var">g</span> + <span class="r-func">scale_fill_manual</span>(values = <span class="r-func">c</span>(<span class="r-string">"#2986cc"</span>, <span class="r-string">"#f78166"</span>, <span class="r-string">"#3fb950"</span>))
+<span class="r-var">g</span> + <span class="r-func">scale_fill_brewer</span>(palette = <span class="r-string">"Set2"</span>)
+
+<span class="r-comment"># Étiquettes de données</span>
+<span class="r-func">ggplot</span>(<span class="r-var">df</span>, <span class="r-func">aes</span>(x = region, y = taux)) +
+  <span class="r-func">geom_col</span>() +
+  <span class="r-func">geom_text</span>(<span class="r-func">aes</span>(label = <span class="r-func">paste0</span>(taux, <span class="r-string">"%"</span>)),
+            vjust = -<span class="r-number">0.5</span>, fontface = <span class="r-string">"bold"</span>)
+
+<span class="r-comment"># Axe Y en pourcentage</span>
+<span class="r-var">g</span> + <span class="r-func">scale_y_continuous</span>(labels = scales::<span class="r-func">percent_format</span>(scale=<span class="r-number">1</span>))
+
+<span class="r-comment"># Sauvegarder un graphique</span>
+<span class="r-func">ggsave</span>(<span class="r-string">"mon_graphique.png"</span>, width = <span class="r-number">10</span>, height = <span class="r-number">6</span>, dpi = <span class="r-number">300</span>)
+<span class="r-func">ggsave</span>(<span class="r-string">"mon_graphique.pdf"</span>, width = <span class="r-number">10</span>, height = <span class="r-number">6</span>)</pre>
+  </div>
+</div>
+
+<!-- =========================================================== 9. EXPORTATION -->
+<div class="section" id="s-export">
+  <div class="section-title">
+    <div class="icon" style="background:#dcfce7;">📤</div>
+    Exportation des résultats
+  </div>
+  <p class="section-sub">Exporter les données nettoyées, les tableaux de résultats et les graphiques dans les formats attendus.</p>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">R</span><span class="code-desc">Exporter vers Excel et CSV</span></div>
+    <pre><span class="r-func">library</span>(writexl)
+<span class="r-func">library</span>(openxlsx)
+
+<span class="r-comment"># Export simple Excel (writexl — sans dépendances Java)</span>
+<span class="r-func">write_xlsx</span>(<span class="r-var">df</span>, <span class="r-string">"résultats.xlsx"</span>)
+
+<span class="r-comment"># Export multi-feuilles</span>
+<span class="r-func">write_xlsx</span>(
+  <span class="r-func">list</span>(
+    <span class="r-string">"Données brutes"</span>  = <span class="r-var">df_brut</span>,
+    <span class="r-string">"Synthèse région"</span> = <span class="r-var">synthese_region</span>,
+    <span class="r-string">"Tendances"</span>       = <span class="r-var">df_tendance</span>
+  ),
+  <span class="r-string">"rapport_final.xlsx"</span>
+)
+
+<span class="r-comment"># Export CSV</span>
+<span class="r-func">write_csv</span>(<span class="r-var">df</span>, <span class="r-string">"données_propres.csv"</span>)
+<span class="r-func">write_csv2</span>(<span class="r-var">df</span>, <span class="r-string">"données_eu.csv"</span>)    <span class="r-comment"># séparateur ;</span>
+
+<span class="r-comment"># Sauvegarder au format RDS (recharge rapide)</span>
+<span class="r-func">saveRDS</span>(<span class="r-var">df</span>, <span class="r-string">"données.rds"</span>)
+<span class="r-comment"># Recharger plus tard :</span>
+<span class="r-var">df</span> <span class="r-keyword">&lt;-</span> <span class="r-func">readRDS</span>(<span class="r-string">"données.rds"</span>)</pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">R</span><span class="code-desc">Exporter des graphiques de haute qualité</span></div>
+    <pre><span class="r-comment"># PNG haute résolution (publications, rapports Word/PowerPoint)</span>
+<span class="r-func">ggsave</span>(<span class="r-string">"graphique.png"</span>,
+       plot   = <span class="r-var">mon_graphique</span>,
+       width  = <span class="r-number">12</span>,
+       height = <span class="r-number">7</span>,
+       units  = <span class="r-string">"in"</span>,
+       dpi    = <span class="r-number">300</span>)
+
+<span class="r-comment"># PDF vectoriel (redimensionnable sans perte)</span>
+<span class="r-func">ggsave</span>(<span class="r-string">"graphique.pdf"</span>, width = <span class="r-number">12</span>, height = <span class="r-number">7</span>)
+
+<span class="r-comment"># SVG (pour le web)</span>
+<span class="r-func">ggsave</span>(<span class="r-string">"graphique.svg"</span>, width = <span class="r-number">10</span>, height = <span class="r-number">6</span>)
+
+<span class="r-comment"># Exporter plusieurs graphiques en une boucle</span>
+<span class="r-keyword">for</span> (<span class="r-var">reg</span> <span class="r-keyword">in</span> <span class="r-func">unique</span>(<span class="r-var">df</span>$region)) {
+  <span class="r-var">p</span> <span class="r-keyword">&lt;-</span> <span class="r-var">df</span> |>
+    <span class="r-func">filter</span>(region == <span class="r-var">reg</span>) |>
+    <span class="r-func">ggplot</span>(<span class="r-func">aes</span>(x=annee, y=taux)) +
+    <span class="r-func">geom_line</span>() +
+    <span class="r-func">labs</span>(title = <span class="r-func">paste</span>(<span class="r-string">"Région :"</span>, <span class="r-var">reg</span>))
+  <span class="r-func">ggsave</span>(<span class="r-func">paste0</span>(<span class="r-string">"graphique_"</span>, <span class="r-var">reg</span>, <span class="r-string">".png"</span>), <span class="r-var">p</span>, width=<span class="r-number">8</span>, height=<span class="r-number">5</span>)
+}</pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">R</span><span class="code-desc">Rapport automatique avec R Markdown</span></div>
+    <pre><span class="r-comment"># Installer knitr et rmarkdown</span>
+<span class="r-func">install.packages</span>(<span class="r-func">c</span>(<span class="r-string">"rmarkdown"</span>, <span class="r-string">"knitr"</span>))
+
+<span class="r-comment"># Dans un fichier .Rmd, l'en-tête YAML :</span>
+<span class="r-output">---
+title: "Rapport de couverture vaccinale"
+author: "Votre nom"
+date: "`r Sys.Date()`"
+output:
+  html_document: default
+  word_document: default
+---</span>
+
+<span class="r-comment"># Générer le rapport depuis R :</span>
+<span class="r-func">rmarkdown</span>::<span class="r-func">render</span>(<span class="r-string">"rapport.Rmd"</span>)
+
+<span class="r-comment"># Tableau formaté dans le rapport</span>
+<span class="r-func">library</span>(knitr)
+<span class="r-func">kable</span>(<span class="r-var">synthese</span>,
+      caption = <span class="r-string">"Synthèse par région"</span>,
+      digits  = <span class="r-number">1</span>,
+      format  = <span class="r-string">"html"</span>)</pre>
+  </div>
+
+  <div class="tip">
+    <strong>✅ Flux de travail recommandé :</strong> Importez → Nettoyez → Analysez → Visualisez → Exportez. Gardez toujours votre script R : il rend votre travail <strong>reproductible à 100%</strong>.
+  </div>
+
+  <div class="card" style="margin-top:24px">
+    <div class="card-title">📚 Ressources pour aller plus loin</div>
+    <ul>
+      <li><strong>R for Data Science (2e éd.)</strong> — r4ds.hadley.nz — gratuit en ligne</li>
+      <li><strong>Cheat Sheets officielles</strong> — posit.co/resources/cheatsheets</li>
+      <li><strong>RStudio Community</strong> — community.posit.co</li>
+      <li><strong>Stack Overflow</strong> — tag [r] pour toutes vos questions</li>
+    </ul>
+  </div>
+</div>
+
+</div><!-- /main -->
+
+<div class="footer-brand">
+  Cours conçu par <strong>KONE Daouda</strong> — Kdaoud Consulting &nbsp;·&nbsp; Statisticien &amp; Analyste Santé Publique &nbsp;·&nbsp; Côte d'Ivoire
+</div>
+
+<script>
+function show(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('s-' + id).classList.add('active');
+  btn.classList.add('active');
+  window.scrollTo({ top: document.querySelector('.nav-container').offsetTop - 10, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
